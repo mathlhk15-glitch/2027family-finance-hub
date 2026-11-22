@@ -1,117 +1,198 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>부부 4억 2,500만 원 안전 예치 · 창원늘푸른신협 9,500만 원안</title><style>
-/* 레이아웃: 요약 타일 → 부부 2열 배분 계산기 → 일정·체크리스트 → 판정·근거·출처. 남색 잉크 + 강철빛 파랑 강조 */
-:root{
-  --bg:#f3f5f8; --surface:#ffffff; --ink:#152033; --muted:#5a6578; --line:#d9dee7;
-  --accent:#1f5fa8; --accent-soft:#e6eef8;
-  --ok:#1e7a4f; --ok-soft:#e3f3ea; --warn:#a36a00; --warn-soft:#fbf0d9; --bad:#b3261e; --bad-soft:#fbe5e3;
-  --f-body:"IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --f-num:"IBM Plex Mono", ui-monospace, Menlo, monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark) and (max-width: 0px){
-  :root:not([data-theme="light"]){
-    --bg:#0e1420; --surface:#161e2d; --ink:#e4e9f2; --muted:#98a3b6; --line:#2a3447;
-    --accent:#6ea8ec; --accent-soft:#1b2a40;
-    --ok:#5cc792; --ok-soft:#14301f; --warn:#e2b04f; --warn-soft:#352a12; --bad:#f08a82; --bad-soft:#3a1a18;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#0e1420; --surface:#161e2d; --ink:#e4e9f2; --muted:#98a3b6; --line:#2a3447;
-  --accent:#6ea8ec; --accent-soft:#1b2a40;
-  --ok:#5cc792; --ok-soft:#14301f; --warn:#e2b04f; --warn-soft:#352a12; --bad:#f08a82; --bad-soft:#3a1a18;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
-.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 60px;display:flex;flex-direction:column;gap:28px}
-h1,h2,h3{text-wrap:balance;margin:0;line-height:1.3}
-h1{font-size:26px;font-weight:700}
-h2{font-size:19px;font-weight:700;display:flex;align-items:baseline;gap:10px}
-h2 .no{font-family:var(--f-num);font-size:13px;color:var(--accent)}
-h3{font-size:15px;font-weight:600}
-p{margin:0;max-width:68ch}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
-section{display:flex;flex-direction:column;gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px}
-.lead{font-size:16px}
-.lead b{color:var(--accent)}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
-.tile .k{font-size:12.5px;color:var(--muted)}
-.tile .v{font-family:var(--f-num);font-size:22px;font-weight:600}
-.tile .s{font-size:12.5px;color:var(--muted)}
-.controls{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end}
-.ctl{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
-select,input[type=number],input[type=date]{font:inherit;font-size:14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
-input[type=number]{width:86px;font-family:var(--f-num)}
-input.bal{width:96px}
-select:focus,input:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.switch{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink);cursor:pointer}
-.switch input{width:18px;height:18px;accent-color:var(--accent)}
-.people{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:16px}
-@media (max-width:480px){.people{grid-template-columns:1fr}}
-.person h3{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
-.tbl-wrap{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:13.5px}
-th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:12px;font-weight:600;color:var(--muted)}
-td.r,th.r{text-align:right}
-tr.total td{font-weight:600;border-bottom:none}
-.inst{font-weight:600}
-.sub{display:block;font-size:12px;color:var(--muted);font-weight:400}
-.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
-.pill.ok{background:var(--ok-soft);color:var(--ok)}
-.pill.warn{background:var(--warn-soft);color:var(--warn)}
-.pill.bad{background:var(--bad-soft);color:var(--bad)}
-.pill.new{background:var(--accent-soft);color:var(--accent)}
-.prot{display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.prot-row{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:13px;flex-wrap:wrap}
-.prot-row .lbl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;flex:1 1 120px;max-width:200px}
-.bar i{display:block;height:100%;background:var(--ok)}
-.bar i.bad{background:var(--bad)}
-.note{border-left:3px solid var(--accent);padding:8px 12px;background:var(--accent-soft);border-radius:0 6px 6px 0;font-size:13.5px}
-.note.warn{border-color:var(--warn);background:var(--warn-soft)}
-.timeline{display:flex;flex-direction:column;gap:0}
-.step{display:grid;grid-template-columns:118px 22px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
-.step:last-child{border-bottom:none}
-.step .d{font-family:var(--f-num);font-size:13px;color:var(--accent);font-weight:600}
-.step input{width:18px;height:18px;margin-top:2px;accent-color:var(--accent)}
-.step.done .t{color:var(--muted);text-decoration:line-through}
-@media (max-width:480px){.step{grid-template-columns:22px 1fr}.step .d{grid-column:2}.step input{grid-row:1/3}}
-.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
-.be{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
-.be-out{font-size:15px}
-.be-out .num{font-size:20px;font-weight:600;color:var(--accent)}
-a{color:var(--accent)}
-footer{font-size:12.5px;color:var(--muted)}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
-</style><style>.compact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.card ul{padding-left:20px}.emphasis{background:#e7f3ee;border:1px solid #a7d9be;border-radius:10px;padding:13px}.alert{background:#fff3e2;border:1px solid #e9c890;border-radius:10px;padding:13px}.person .tbl-wrap{overflow-x:auto}.person table{min-width:440px}.lead{max-width:unset}.summary{font-size:17px;font-weight:700;color:#155cb0}.controls .ctl{min-width:140px}input[type=number]{min-width:70px}.card{overflow:hidden}@media(max-width:650px){.compact{grid-template-columns:1fr}.wrap{padding:16px 11px 45px}.people{grid-template-columns:1fr}.tile .v{font-size:19px}}@media print{button,input[type=checkbox]{display:none!important}.wrap{padding:0}.card,.tile{break-inside:avoid}}</style><style id="site-connect-style">.site-connect{position:sticky;top:0;z-index:99;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 16px;background:#fff;border-bottom:1px solid #d6e4ec;box-shadow:0 3px 14px #16304614;font:700 13px system-ui,"Malgun Gothic",sans-serif;color:#173d55}.site-connect .site-links{display:flex;flex-wrap:wrap;gap:6px}.site-connect a{display:inline-block;padding:8px 11px;border-radius:10px;background:#edf5fa;color:#15556b;text-decoration:none}.site-connect a.current{background:#146e83;color:#fff}.site-connect a:hover{filter:brightness(.94)}@media(max-width:530px){.site-connect{align-items:flex-start;flex-direction:column;gap:6px;padding:7px 10px}.site-connect .site-links{width:100%}.site-connect a{flex:1;text-align:center;padding:7px 4px;font-size:12px}}</style></head><body><div class="site-connect"><span>우리 부부의 자금 관리</span><div class="site-links"><a href="index.html">🏠 전체 안내</a><a href="deposit.html" class="current" aria-current="page">💰 예금 운용</a><a href="tax.html">🧾 양도세 신고</a></div></div><main class="wrap">
-<header class="hero"><p class="small muted">2026.11.22 기준 · 실제 가입 전 확인용 · 밝은 화면 · 모바일 지원</p><h1>부부 4억 2,500만 원 안전 예치 실행안</h1><p class="lead">추천: <b>창원늘푸른신협 각 9,500만 원(세금우대 3,000만 + 일반과세 6,500만)</b>, 다른 은행에 장기 각 6,750만 원, 단기 각 5,000만 원을 보관합니다. 신협의 <b>연 4.05%는 세전 광고금리</b>로 계산합니다.</p><div class="cut"><i></i><i></i></div><p class="small muted">장기 3억 2,500만 원(12개월 가정) · 2027년 1월 인출자금 1억 원(별도)</p></header>
-<section><h2><span class="no">01</span>최종 권장 배분과 이유</h2><div class="card tbl-wrap"><table><thead><tr><th>금융기관·구분</th><th class="r">남편</th><th class="r">아내</th><th>이유</th></tr></thead><tbody><tr><td>창원늘푸른신협 세금우대 12개월</td><td class="r">3,000만</td><td class="r">3,000만</td><td>요건 충족 시 1인 세금우대 한도</td></tr><tr><td>창원늘푸른신협 일반과세 12개월</td><td class="r">6,500만</td><td class="r">6,500만</td><td>동일 4.05% 적용 가정 시 은행 3.98%보다 세후 유리</td></tr><tr><td>전북은행 등 다른 은행 12개월</td><td class="r">6,750만</td><td class="r">6,750만</td><td>1인 장기 1억 6,250만에서 신협 9,500만을 뺀 잔액</td></tr><tr><td>기존 거래은행 단기, 1/28 인출</td><td class="r">5,000만</td><td class="r">5,000만</td><td>2027.1.30(토) 필요 자금 확보, 신협·장기은행과 별도 보호한도</td></tr><tr class="total"><td>합계</td><td class="r">2억 1,250만</td><td class="r">2억 1,250만</td><td>부부 합계 4억 2,500만 원</td></tr></tbody></table></div><div class="emphasis">왜 신협 9,500만 원인가? <b>9,500만 × 4.05% = 세전 이자 384만 7,500원</b>, 원리금 <b>9,884만 7,500원</b>입니다. 기존 잔액이 없다면 1억 원 보호기준 안에 들어옵니다. 단, 두 예탁금의 금리가 모두 4.05%로 실제 적용되는 경우에 한합니다.</div><p class="small muted">9,500만 원은 법정 예치상한이 아닌 관리상 기준입니다. 조합원 출자금은 보호대상 예금이 아닙니다. 신협의 보호는 은행 예금보험공사 제도와 보호 주체가 다릅니다.</p></section>
-<section><h2><span class="no">02</span>부부별 예상 이자·보호한도 계산기</h2><div class="card stack"><div class="controls"><label class="ctl">신협 세금우대 세율<select id="mutualTax"><option value="0.059">5.9% 가정 · 2026 일반 고소득</option><option value="0.014">1.4% 가정 · 비과세 요건</option><option value="0.095">9.5% 가정 · 2027 일반 고소득</option><option value="0.154">15.4% · 특례 미적용</option></select></label><label class="ctl">단기자금 가입일<input id="startDate" type="date" value="2026-11-25"></label><div class="ctl"><span>단기 인출일</span><b>2027-01-28 · <span id="days">64</span>일</b></div></div><p class="small muted">아래 금리는 초기 계산용입니다. 신협 4.05%는 이용자가 확인한 세전 광고금리이며, 금리 적용 범위·한도·가입자격을 직접 확인해야 합니다.</p></div><div class="people"><article class="card person"><h3>남편 <span class="small muted">단기: 경남은행 예시</span></h3><div class="tbl-wrap"><table><thead><tr><th>상품</th><th class="r">원금(만)</th><th class="r">세전금리%</th><th class="r">세후이자(만)</th></tr></thead><tbody id="tb-hk"></tbody></table></div><div class="stack"><h3>금융기관별 기존 잔액(만원) 입력</h3><div id="balances-hk" class="rows"></div><div id="prot-hk" class="prot"></div></div></article><article class="card person"><h3>아내 <span class="small muted">단기: NH농협은행 예시</span></h3><div class="tbl-wrap"><table><thead><tr><th>상품</th><th class="r">원금(만)</th><th class="r">세전금리%</th><th class="r">세후이자(만)</th></tr></thead><tbody id="tb-is"></tbody></table></div><div class="stack"><h3>금융기관별 기존 잔액(만원) 입력</h3><div id="balances-is" class="rows"></div><div id="prot-is" class="prot"></div></div></article></div><div class="tiles"><div class="tile"><span class="k">부부 장기예금 세후 예상 이자</span><span class="v" id="longNet">–</span><span class="s">12개월 단리 가정</span></div><div class="tile"><span class="k">부부 단기자금 세후 예상 이자</span><span class="v" id="shortNet">–</span><span class="s">시작일~2027.1.28</span></div><div class="tile"><span class="k">기존안 대비 신협 추가 6,500만의 이득</span><span class="v" id="gain">–</span><span class="s">은행 3.98% 일반과세와 비교</span></div><div class="tile"><span class="k">원리금 보호 여유 점검</span><span class="v" id="status">–</span><span class="s" id="statusText">기존 잔액을 입력하세요</span></div></div><div class="card stack"><p class="small">기존 잔액에는 해당 기관의 다른 예금·입출금 잔액과 그 예상 이자까지 여유 있게 반영하세요. 계산기의 보호한도는 만기 세전 약정이자 전체를 합산한 보수적 사전점검입니다. 법률상 보호이자의 계산과 정확히 같지는 않습니다.</p><div class="rows"><button class="btn secondary" id="resetBtn" type="button">입력값 초기화</button><button class="btn" id="printBtn" type="button">인쇄 · PDF 저장</button></div></div></section>
-<section><h2><span class="no">03</span>신협에 9,500만 원을 넣어도 되는 조건</h2><div class="card stack"><div class="compact"><div class="emphasis"><b>조건 1 · 광고금리 적용</b><p>세금우대 3,000만 원뿐 아니라 <b>일반과세 6,500만 원도 세전 4.05%</b>인지 확인합니다. 신규자·상품별 한도·판매종료 여부도 문의합니다.</p></div><div class="emphasis"><b>조건 2 · 보호한도</b><p>기존 잔액이 없는 같은 신협에만 9,500만 원을 넣습니다. 만기 기준 합산 원리금은 9,884만 7,500원으로 보호한도까지 115만 2,500원 남습니다.</p></div></div><div class="alert"><b>더 높은 금리의 은행이 있다면?</b> 신협 일반과세 6,500만 원과 은행 일반과세는 세율이 같으므로 <b>가입가능 금리가 높은 곳</b>을 고르면 됩니다. 예를 들어 은행이 4.10%라면 신협 4.05%보다 은행이 유리합니다.</div><p>은행 3.98% 대신 신협 4.05%에 일반과세 6,500만 원을 넣으면 <b>한 사람당 세후 약 3만 8,493원, 부부 합산 약 7만 6,986원</b>을 더 받는 계산입니다. 큰 차이가 아니므로 신협 가입 편의·출자금·기존 잔액도 함께 고려하세요.</p></div></section>
-<section><h2><span class="no">04</span>실행 순서</h2><div class="card timeline" id="checklist"></div><p class="small muted">체크 상태는 이 기기 브라우저에만 저장됩니다.</p></section>
-<section><h2><span class="no">05</span>검수·주의사항</h2><div class="card stack"><ul><li><b>1억 원 단기자금:</b> 2027.1.30은 토요일입니다. 1.28(목)까지 해지 손실 없이 인출 가능한 상품을 선택하고 1.29까지 결제용 계좌에 확보합니다.</li><li><b>양도세:</b> 2026.11.20 잔금 기준 예정신고기한은 2027.2.1(월)입니다. 개인지방소득세까지 합쳐 1억 원이 충분한지 확인합니다. 세액에 따라 분납 요건을 별도 점검합니다.</li><li><b>자금 소유권:</b> 부부 반반은 공동명의 50:50 또는 적법한 증여 등 소유권과 일치할 때의 예시입니다.</li><li><b>계좌 개설:</b> 20영업일 제한을 기계적으로 확정하지 마세요. 신규 입출금통장 필요 여부 및 예외를 신협·은행에 먼저 문의합니다.</li><li><b>건강보험·금융소득:</b> 다른 예금 이자·배당까지 개인별로 합산해 확인합니다. 금융소득종합과세 연 2,000만 원 기준만으로 건강보험 문제까지 단정할 수 없습니다.</li><li><b>중도해지:</b> 9,500만 원을 3,000만+3,000만+3,500만 원 등으로 나누면 일부 해지가 편하지만 계좌별 가입 조건·세금우대 한도가 동일한지 확인하세요.</li></ul></div></section>
-<section><h2><span class="no">06</span>관련 공식 확인처</h2><div class="card small"><ul><li><a href="https://www.fsc.go.kr/" target="_blank" rel="noopener">금융위원회 — 예금보호한도 정책 자료</a></li><li><a href="https://www.law.go.kr/" target="_blank" rel="noopener">국가법령정보센터 — 조세특례제한법·농어촌특별세법</a></li><li><a href="https://www.nts.go.kr/" target="_blank" rel="noopener">국세청 — 양도소득세 신고·분납 안내</a></li><li><a href="https://finlife.fss.or.kr/" target="_blank" rel="noopener">금융감독원 금융상품 한눈에 — 은행 예금금리 비교</a></li></ul><p class="small muted">창원늘푸른신협 연 4.05%는 사용자가 직접 확인한 12개월 세전 광고금리입니다. 세금우대·일반과세 2개 예탁금 모두에 적용되는지는 확인 전입니다. 다른 은행의 3.98%, 단기 2.80%도 비교 시뮬레이션용 입력값입니다.</p></div></section>
-<footer><p><a href="tax.html" style="font-weight:700">다음 단계 → 양도소득세 신고·납부 따라하기</a></p>작성 기준 2026-11-22 · 수정판: 창원늘푸른신협 9,500만 원 배분 검토 · 금리/가입한도/소유권/예금자보호 사전 점검 자료</footer>
-</main><script>
-(()=>{'use strict';
-const $=id=>document.getElementById(id), units=n=>Number(n).toLocaleString('ko-KR',{maximumFractionDigits:2}), man=n=>units(n)+'만 원', MAX=10000, END=Date.UTC(2027,0,28);
-const seed={hk:[{id:'h1',n:'창원늘푸른신협',product:'세금우대 12개월',p:3000,r:4.05,kind:'fav',grp:'신협'},{id:'h2',n:'창원늘푸른신협',product:'일반과세 12개월',p:6500,r:4.05,kind:'long',grp:'신협'},{id:'h3',n:'전북은행',product:'12개월',p:6750,r:3.98,kind:'long',grp:'전북은행'},{id:'h4',n:'경남은행',product:'단기 · 1/28 이전 현금화',p:5000,r:2.8,kind:'short',grp:'경남은행'}],is:[{id:'w1',n:'창원늘푸른신협',product:'세금우대 12개월',p:3000,r:4.05,kind:'fav',grp:'신협'},{id:'w2',n:'창원늘푸른신협',product:'일반과세 12개월',p:6500,r:4.05,kind:'long',grp:'신협'},{id:'w3',n:'전북은행',product:'12개월',p:6750,r:3.98,kind:'long',grp:'전북은행'},{id:'w4',n:'NH농협은행',product:'단기 · 1/28 이전 현금화',p:5000,r:2.8,kind:'short',grp:'NH농협은행'}]};
-const rates={},balance={},groupNames={hk:['신협','전북은행','경남은행'],is:['신협','전북은행','NH농협은행']};Object.values(seed).flat().forEach(x=>rates[x.id]=x.r);
-function num(x){const v=Number(x);return Number.isFinite(v)&&v>=0?v:0;}
-function days(){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec($('startDate').value);if(!m)return 0;return Math.max(0,Math.round((END-Date.UTC(+m[1],+m[2]-1,+m[3]))/86400000));}
-function render(){let ln=0,sn=0,all=true,minSpace=1e9;const d=days(),tax=num($('mutualTax').value);$('days').textContent=d;
-for(const who of ['hk','is']){let sumLong=0,sumShort=0,rows=[],sums={};for(const x of seed[who]){const r=rates[x.id],g=x.p*r/100*(x.kind==='short'?d/365:1),t=x.kind==='fav'?tax:.154,net=g*(1-t);if(x.kind==='short')sumShort+=net;else sumLong+=net;sums[x.grp]=(sums[x.grp]||0)+x.p+g;rows.push('<tr><td><b>'+x.n+'</b><span class="sub">'+x.product+'</span></td><td class="r num">'+units(x.p)+'</td><td class="r"><input type="number" min="0" max="20" step="0.01" data-rate="'+x.id+'" value="'+r.toFixed(2)+'" aria-label="'+x.n+' '+x.product+' 세전 금리" style="width:75px"></td><td class="r num">'+units(net)+'</td></tr>');}rows.push('<tr class="total"><td>장기 합계</td><td class="r">16,250</td><td></td><td class="r">'+units(sumLong)+'</td></tr><tr class="total"><td>단기 포함 전체</td><td class="r">21,250</td><td></td><td class="r">'+units(sumLong+sumShort)+'</td></tr>');$('tb-'+who).innerHTML=rows.join('');ln+=sumLong;sn+=sumShort;
-let html='';for(const [i,grp] of groupNames[who].entries()){const ex=balance[who+'-'+i]||0,tot=(sums[grp]||0)+ex,space=MAX-tot;minSpace=Math.min(minSpace,space);if(space<0)all=false;html+='<div class="prot-row"><span class="lbl">'+grp+' <b class="num">'+man(tot)+'</b></span><span class="pill '+(space<0?'bad':space<150?'warn':'ok')+'">'+(space<0?'초과 '+man(-space):'여유 '+man(space))+'</span></div>';}$('prot-'+who).innerHTML=html;}
-$('longNet').textContent=man(ln);$('shortNet').textContent=man(sn);const gain=2*6500*((rates.h2/100)-(rates.h3/100))*.846;$('gain').textContent=(gain>=0?'+':'')+man(gain);$('status').textContent=all?'한도 이내':'한도 초과';$('status').style.color=all?'var(--ok)':'var(--bad)';$('statusText').textContent=(all?'가장 작은 보호여유 ':'최소 초과액 ')+man(Math.abs(minSpace))+' · 기존 잔액 입력 필요';document.querySelectorAll('[data-rate]').forEach(el=>el.addEventListener('change',()=>{const v=Number(el.value);if(Number.isFinite(v)&&v>=0&&v<=20){rates[el.dataset.rate]=v;render();}}));}
-for(const who of ['hk','is']){$('balances-'+who).innerHTML=groupNames[who].map((g,i)=>'<label class="ctl">'+g+' 기존 잔액·이자(만원)<input type="number" min="0" step="10" value="0" data-bal="'+who+'-'+i+'" aria-label="'+g+' 기존잔액"></label>').join('');}
-document.querySelectorAll('[data-bal]').forEach(e=>e.addEventListener('input',()=>{balance[e.dataset.bal]=num(e.value);render();}));$('mutualTax').addEventListener('change',render);$('startDate').addEventListener('change',render);$('resetBtn').addEventListener('click',()=>{Object.values(seed).flat().forEach(x=>rates[x.id]=x.r);document.querySelectorAll('[data-bal]').forEach(e=>{e.value=0;balance[e.dataset.bal]=0;});$('mutualTax').value='.059';$('startDate').value='2026-11-25';render();});$('printBtn').addEventListener('click',()=>window.print());
-const tasks=[['11/23~','창원늘푸른신협에 전화: 4.05%가 세금우대 3,000만 + 일반과세 6,500만 각각에 적용되는지, 1인 9,500만 가입 가능한지 확인'],['11/23~','같은 신협 기존 예금 및 다른 조합 세금우대 사용한도 확인; 출자금과 금고·조합 보호단위 확인'],['11/23~','부부의 실제 주택 소유지분과 매도대금 입금 내역 및 다른 은행 잔액 확인'],['11월 중','신협 각 9,500만 원은 세금우대 3,000만 / 일반과세 6,500만으로 구분하여 가입(조건 확인 후)'],['11월 중','전북은행 등 별도 은행에 각 6,750만 원 정기예금; 실제 적용금리가 더 높은 은행이 있다면 교체'],['11~12월','단기 각 5,000만 원은 위 두 기관과 다른 기존 주거래은행에서 2027.1.28까지 현금화 가능한 상품에 보관'],['12월 중','양도세 국세·지방소득세 확정 또는 추정하여 1억 원 충분한지 확인. 이체한도·한도제한계좌 점검'],['2027.1.28~29','단기자금을 출금할 계좌로 이전하고 납부 준비'],['2027.2.1','2026.11.20 잔금 기준 양도세 예정신고·납부 법정기한 확인'],['2027.11~12','만기 시 자동재예치를 막고 자금 계획·당시 금리를 재평가']];let saved={};try{saved=JSON.parse(localStorage.getItem('deposit9500tasks')||'{}')}catch{}$('checklist').innerHTML=tasks.map((t,i)=>'<div class="step'+(saved[i]?' done':'')+'" id="task'+i+'"><span class="d">'+t[0]+'</span><input type="checkbox" id="taskC'+i+'" '+(saved[i]?'checked':'')+'><span class="t">'+t[1]+'</span></div>').join('');tasks.forEach((t,i)=>$('taskC'+i).addEventListener('change',e=>{saved[i]=e.target.checked;$('task'+i).classList.toggle('done',e.target.checked);try{localStorage.setItem('deposit9500tasks',JSON.stringify(saved))}catch{}}));render();
-})();</script></body></html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1a6fdf">
+<title>예금 운용 계산기 · 우리 부부 집 판 돈 관리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="topnav" aria-label="사이트 메뉴"><div class="in">
+  <a class="brand" href="index.html">우리 부부 집 판 돈 관리</a>
+  <div class="menu"><a href="index.html">한눈에</a><a href="deposit.html" aria-current="page">예금 운용</a><a href="tax.html">양도세 신고</a></div>
+</div></nav>
+
+<header class="hero"><div class="in">
+  <span class="kicker">부부 각자 2억 1,250만 · 1인 장기 1억 6,250만 + 단기 5,000만</span>
+  <h1>예금 운용 계산기</h1>
+  <p class="lead">신협 금리를 전화로 확인한 뒤 숫자만 바꾸면, 어느 안이 유리한지와 금융회사별 예금자보호 한도를 바로 보여줍니다.</p>
+</div></header>
+
+<main>
+  <section aria-labelledby="h-plan">
+    <div class="sec-head"><span class="step-no">01 · 안 고르기</span><h2 id="h-plan">세 가지 배분안</h2></div>
+    <div class="grid2">
+      <div class="card stack">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>A안 · 신협 9,500만</h3><span class="pill info">신협 일반 금리가 높을 때</span></div>
+        <div class="tbl"><table>
+          <thead><tr><th>1인 기준</th><th class="r">금액</th></tr></thead>
+          <tbody>
+            <tr><td>창원늘푸른신협 세금우대 예탁금<span class="sub">12개월 · 저율과세 한도</span></td><td class="r">3,000만</td></tr>
+            <tr><td>창원늘푸른신협 일반 예탁금<span class="sub">12개월 · 일반과세</span></td><td class="r">6,500만</td></tr>
+            <tr><td>전북은행 JB 다이렉트 예금<span class="sub">12개월 · 우대조건 없음</span></td><td class="r">6,750만</td></tr>
+            <tr><td>기존 은행 단기예금<span class="sub">남편 경남은행 · 아내 농협</span></td><td class="r">5,000만</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card stack">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>B안 · 전북은행 9,500만</h3><span class="pill ok">1금융 비중이 클 때</span></div>
+        <div class="tbl"><table>
+          <thead><tr><th>1인 기준</th><th class="r">금액</th></tr></thead>
+          <tbody>
+            <tr><td>창원늘푸른신협 세금우대 예탁금<span class="sub">12개월 · 저율과세 한도</span></td><td class="r">3,000만</td></tr>
+            <tr><td>전북은행 JB 다이렉트 예금<span class="sub">12개월 · 우대조건 없음</span></td><td class="r">9,500만</td></tr>
+            <tr><td>기존 은행 12개월 예금<span class="sub">남편 경남은행 · 아내 국민은행</span></td><td class="r">3,750만</td></tr>
+            <tr><td>기존 은행 단기예금<span class="sub">남편 경남은행 · 아내 농협</span></td><td class="r">5,000만</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+      <div class="card stack">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3>C안 · 케이뱅크 9,500만 (선이자)</h3><span class="pill warn">선이자를 바로 재예치할 때</span></div>
+        <div class="tbl"><table>
+          <thead><tr><th>1인 기준</th><th class="r">금액</th></tr></thead>
+          <tbody>
+            <tr><td>창원늘푸른신협 세금우대 예탁금<span class="sub">12개월 · 저율과세 한도</span></td><td class="r">3,000만</td></tr>
+            <tr><td>케이뱅크 내맘대로 이자받는 정기예금<span class="sub">12개월 · 가입 즉시 이자 수령 → 재예치</span></td><td class="r">9,500만</td></tr>
+            <tr><td>기존 은행 12개월 예금<span class="sub">남편 경남은행 · 아내 국민은행</span></td><td class="r">3,750만</td></tr>
+            <tr><td>기존 은행 단기예금<span class="sub">남편 경남은행 · 아내 농협</span></td><td class="r">5,000만</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="callout ok" id="verdict"><b class="t">계산 중…</b></div>
+    <div class="callout info"><b class="t">선이자는 보너스가 아니라 '이자를 1년 먼저 받는 것'입니다</b><p class="small">가치는 먼저 받은 이자를 다시 1년 굴려서 생기는 이자뿐입니다. 9,500만 원을 3.91%로 맡기면 가입일에 약 371만 원(세전)을 받고, 이를 3.9%로 다시 넣으면 약 14만 원이 더 붙어 만기 지급 4.06%와 비슷해집니다. 받은 이자를 쓰거나 통장에 그냥 두면 효과가 없습니다. 중도해지하면 먼저 받은 이자를 돌려주고 중도해지 금리로 다시 계산합니다.</p></div>
+  </section>
+
+  <section aria-labelledby="h-calc">
+    <div class="sec-head"><span class="step-no">02 · 금리 넣기</span><h2 id="h-calc">금리·세율·날짜</h2></div>
+    <div class="card stack">
+      <div class="fields">
+        <div class="field"><span>보여줄 안</span>
+          <div class="seg" role="group" aria-label="배분안 선택"><button type="button" id="scA" aria-pressed="true">A안 신협 9,500만</button><button type="button" id="scB" aria-pressed="false">B안 전북 9,500만</button><button type="button" id="scC" aria-pressed="false">C안 케이뱅크 선이자</button></div>
+        </div>
+      </div>
+      <div class="fields">
+        <label class="field" for="rFav">신협 세금우대 금리 %<input type="number" id="rFav" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rGen">신협 일반 예탁금 금리 %<input type="number" id="rGen" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rJb">전북은행 금리 %<input type="number" id="rJb" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rKb">케이뱅크 12개월 금리 %<input type="number" id="rKb" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rRe">선이자 재예치 금리 %<input type="number" id="rRe" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rEx">기존 은행 12개월 금리 %<input type="number" id="rEx" step="0.01" min="0" max="15"></label>
+        <label class="field" for="rShort">단기예금 금리 %<input type="number" id="rShort" step="0.01" min="0" max="15"></label>
+      </div>
+      <div class="fields">
+        <label class="field" for="tax">신협 세금우대 세율
+          <select id="tax">
+            <option value="0.059">5.9% · 총급여 7,000만 초과, 2026년 가입</option>
+            <option value="0.095">9.5% · 총급여 7,000만 초과, 2027년 가입</option>
+            <option value="0.014">1.4% · 총급여 7,000만 이하</option>
+            <option value="0.154">15.4% · 세금우대 적용 안 됨</option>
+          </select></label>
+        <label class="field" for="start">단기예금 가입일<input type="date" id="start" class="wide"></label>
+        <label class="field" for="mat">단기예금 만기일<input type="date" id="mat" class="wide"></label>
+        <div class="field"><span>단기 예치 기간</span><b class="num" id="days" style="font-size:18px;padding:6px 0">–</b></div>
+      </div>
+      <p class="tiny muted">기본값: 신협 4.05%(용호동 지점 광고 12개월 세전, 일반 예탁금 적용 여부는 확인 필요), 전북 3.98%·경남 The파트너 3.60%(2026.11.15 금감원 공시), 케이뱅크 3.91%(케이뱅크 상품 목록 12개월, 선이자 선택 시 같은 금리인지는 확인 필요), 단기 2.80%(가정). 신협 세율 5.9%는 소득세 5% + 농어촌특별세 0.9%를 보수적으로 합친 값이며 지방소득세는 붙지 않습니다. 두 분 총급여가 각 9,000만 원 수준이라 기본값을 5.9%로 두었습니다.</p>
+    </div>
+
+    <div class="tiles">
+      <div class="tile"><span class="k">부부 장기 12개월 세후 이자</span><span class="v" id="tLong">–</span><span class="s" id="tLongS">–</span></div>
+      <div class="tile mint"><span class="k">부부 단기 세후 이자</span><span class="v" id="tShort">–</span><span class="s" id="tShortS">–</span></div>
+      <div class="tile sun"><span class="k">가장 유리한 안 (부부 장기 세후)</span><span class="v" id="tDiff">–</span><span class="s" id="tDiffS">–</span></div>
+      <div class="tile"><span class="k">예금자보호 1억 한도</span><span class="v" id="tProt">–</span><span class="s" id="tProtS">기존 잔액 포함</span></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card stack" id="card-hk">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h3>남편</h3><span class="tiny muted">기존 거래: 경남은행</span></div>
+        <div class="tbl"><table><thead><tr><th>금융회사 · 상품</th><th class="r">원금</th><th class="r">세후 이자</th></tr></thead><tbody id="tb-hk"></tbody></table></div>
+        <h3 class="small" style="margin-top:4px">금융회사별 원리금 (기존 잔액은 만원 단위로 입력)</h3>
+        <div class="prot" id="prot-hk"></div>
+      </div>
+      <div class="card stack" id="card-is">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h3>아내</h3><span class="tiny muted">기존 거래: 국민·농협·카카오뱅크</span></div>
+        <div class="tbl"><table><thead><tr><th>금융회사 · 상품</th><th class="r">원금</th><th class="r">세후 이자</th></tr></thead><tbody id="tb-is"></tbody></table></div>
+        <h3 class="small" style="margin-top:4px">금융회사별 원리금 (기존 잔액은 만원 단위로 입력)</h3>
+        <div class="prot" id="prot-is"></div>
+      </div>
+    </div>
+    <div class="btns">
+      <button class="btn ghost" type="button" id="copyBtn">계산 결과 복사</button>
+      <button class="btn ghost" type="button" id="resetBtn">기본값으로 되돌리기</button>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-why">
+    <div class="sec-head"><span class="step-no">03 · 근거</span><h2 id="h-why">왜 이 금액인가</h2></div>
+    <div class="tbl"><table>
+      <thead><tr><th>금액 (1인)</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><td class="num"><b>3,000만</b></td><td>상호금융 세금우대 예탁금 한도는 신협·새마을금고·농축협을 모두 합쳐 1인 3,000만 원입니다. 더 넣은 금액은 일반과세(15.4%)라 세금 혜택이 없습니다.</td></tr>
+        <tr><td class="num"><b>9,500만</b></td><td>예금자보호는 금융회사별·1인별 원금과 이자를 합쳐 1억 원까지입니다. 연 4%대 금리로 9,500만 원을 넣으면 원리금이 약 9,880만 원이라 한도 안에 들어옵니다. 9,500만은 법정 상한이 아니라 이자까지 고려한 관리 기준입니다.</td></tr>
+        <tr><td class="num"><b>6,750만 / 3,750만</b></td><td>1인 장기자금 1억 6,250만에서 앞의 금액을 뺀 나머지입니다.</td></tr>
+        <tr><td class="num"><b>5,000만</b></td><td>1월에 쓸 1억 원을 부부 지분대로 반씩 나눈 금액입니다. 공동명의 양도세는 각자 자기 지분만큼 냅니다. 이체한도가 이미 풀린 기존 계좌에 둬야 1월 28일에 바로 납부할 수 있습니다.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section aria-labelledby="h-call" id="call">
+    <div class="sec-head"><span class="step-no">04 · 가입 전 전화</span><h2 id="h-call">신협에 물어볼 것</h2></div>
+    <div class="card stack">
+      <div class="checks" id="callChecks"></div>
+      <div class="callout info"><b class="t">답을 들은 뒤</b><p class="small">들은 금리를 위 칸에 넣으면 A안·B안 판정이 바로 바뀝니다. 신협 일반 예탁금 금리가 전북은행보다 낮으면 B안을 고르세요. A안과 B안의 세후 차이는 금리 0.1%p당 1인 6,500만 기준 연 약 5.5만 원입니다.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-order" id="order">
+    <div class="sec-head"><span class="step-no">05 · 실행 순서</span><h2 id="h-order">새 통장 개설 순서와 체크리스트</h2></div>
+    <div class="callout warn"><b class="t">20영업일 규칙</b><p class="small">입출금 통장을 새로 만들면 20영업일 동안 다른 금융회사에서 입출금 통장을 더 만들기 어렵습니다(대포통장 방지 지침). 두 분 모두 최근 한 달간 새 통장이 없으니, 11월 23일에 첫 곳을 열면 두 번째 곳은 12월 22일부터 열 수 있습니다. 창구에서 매매계약서로 목적을 설명하면 예외로 받아주는 경우도 있습니다. 새로 연 통장은 한동안 하루 이체한도가 100만 원(창구 300만 원)으로 묶입니다.</p></div>
+    <div class="card stack">
+      <p class="small" id="orderLead"></p>
+      <div class="progress" aria-hidden="true"><i id="ordBar"></i></div>
+      <div class="checks" id="orderChecks"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-care">
+    <div class="sec-head"><span class="step-no">06 · 주의</span><h2 id="h-care">놓치기 쉬운 것</h2></div>
+    <div class="grid2">
+      <div class="card"><ul class="clean small">
+        <li><b>출자금</b>(보통 1만~10만 원)은 예금자보호 대상이 아닙니다. 최소 금액만 내세요.</li>
+        <li><b>신협 보호</b>는 신협중앙회 예금자보호기금이 1인 1억 원까지 보호합니다. 은행(예금보험공사)과 한도는 같고 운영 주체가 다릅니다.</li>
+        <li><b>세금우대 한도는 전 조합 합산</b>입니다. 아내의 '농협'이 지역농협이고 이미 세금우대 예탁금이 있다면 그만큼 줄여야 합니다.</li>
+        <li><b>9,500만은 계좌 3개로</b>(3,000·3,000·3,500만) 나누면 급할 때 일부만 해지할 수 있습니다.</li>
+      </ul></div>
+      <div class="card"><ul class="clean small">
+        <li><b>대기 중인 돈</b>: 두 번째 금융회사를 열기 전까지 그 몫이 기존 은행에 머뭅니다. 남편 경남은행은 이 기간에 합계가 1억을 잠깐 넘을 수 있습니다. 1금융·한 달이라 위험은 낮지만 원칙상 한도 밖입니다.</li>
+        <li><b>비과세가 확인되면</b> 1월용 1억 원이 필요 없습니다. 단기예금 만기 후 장기예금으로 옮기면 됩니다.</li>
+        <li><b>자동 재예치</b>는 꺼 두고 2027년 11월 만기 때 금리와 계획을 다시 봅니다. 그때 신협 세금우대는 2027년 가입분 세율(9.5%)이 됩니다.</li>
+        <li><b>종합과세</b>: 1인 일반과세 이자는 연 400만~500만 원대라 2,000만 원 기준과 거리가 멉니다. 신협 저율과세분은 합산에서 빠집니다.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-src">
+    <div class="sec-head"><h2 id="h-src">근거 자료</h2></div>
+    <div class="card small"><ul class="clean">
+      <li><a href="https://www.fsc.go.kr/po020201/84975" target="_blank" rel="noopener">금융위원회 · 예금보호한도 1억 원 Q&amp;A (원금+소정의 이자, 상호금융 포함)</a></li>
+      <li><a href="https://jab-guyver.co.kr/7871" target="_blank" rel="noopener">12개월 정기예금 비교 (금감원 통합비교공시 2026.11.15 기준: 전북·경남·SC)</a></li>
+      <li><a href="https://www.taxtimes.co.kr/news/article.html?no=273069" target="_blank" rel="noopener">세정일보 · 2026년부터 달라지는 세법 (상호금융 총급여 7,000만 초과 5%·9%)</a></li>
+      <li><a href="https://ai.bznav.com/contents/3276642" target="_blank" rel="noopener">조합 예탁금 5%·9% 분리과세 · 지방소득세 미부과, 종합과세 합산 제외</a></li>
+      <li><a href="https://news.bizwatch.co.kr/article/finance/2020/11/05/0015" target="_blank" rel="noopener">비즈워치 · 단기간 다수계좌 개설 제한(20영업일)</a></li>
+      <li><a href="https://kbthink.com/main/asset-management/wealth-manage-tip/season/limit_account.html" target="_blank" rel="noopener">KB Think · 한도제한계좌 이체한도</a></li>
+      <li><a href="https://www.kbanknow.com/web/product/info/list?tab=deposit" target="_blank" rel="noopener">케이뱅크 예금 상품 목록 · 내맘대로 이자받는 정기예금 12개월 3.91%</a></li>
+      <li><a href="https://www.tossbank.com/articles/smart-start-deposit" target="_blank" rel="noopener">토스뱅크 · 먼저 이자 받는 정기예금 안내(중도해지 시 선이자 차감)</a></li>
+      <li><a href="https://www.tossbank.com/articles/desired-date-maturity" target="_blank" rel="noopener">토스뱅크 · 원하는 날 만기 정기예금(1개월~3년, 12개월 이상 3.8%)</a></li>
+      <li><a href="https://finlife.fss.or.kr" target="_blank" rel="noopener">금융상품 한눈에 · 가입 당일 금리 확인</a></li>
+    </ul></div>
+  </section>
+</main>
+<footer>입력값은 이 기기 브라우저에만 저장되며 서버로 보내지 않습니다. 금리·세율은 가입 당일 금융회사 안내가 최종입니다. <a href="tax.html">다음: 양도세 신고 →</a></footer>
+
+<script src="common.js"></script>
+<script src="deposit.js"></script>
+</body>
+</html>
