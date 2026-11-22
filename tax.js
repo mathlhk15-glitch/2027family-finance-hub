@@ -2,7 +2,8 @@
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var T = Object.assign({ sale: '', buy: '', cost: '', share: 50, acq: '', verdict: 'unknown', pre: {}, docs: {}, h: {}, w: {} }, CM.load('tax', {}));
+  var T = Object.assign({ sale: '', buy: '', cost: '', share: 50, acq: '', verdict: 'unknown', pre: {}, docs: {}, h: {}, w: {}, expenses: {} }, CM.load('tax', {}));
+  if (!T.expenses || typeof T.expenses !== 'object') T.expenses = {};
   var saleISO = CM.load('saleDate', '2026-11-20');
 
   function persist() { CM.save('tax', T); }
@@ -52,7 +53,41 @@
     $('verdictMsg').className = 'callout ' + m[0];
     $('verdictMsg').innerHTML = '<p class="small">' + m[1] + '</p>';
   }
-  $('verdict').addEventListener('change', function () { T.verdict = this.value; persist(); renderVerdict(); calc(); });
+  $('verdict').addEventListener('change', function () { T.verdict = this.value; persist(); var ax=CM.load('taxActual',{}); ax.confirmed=false; ax.verdict=T.verdict; CM.save('taxActual',ax); renderActual(); renderVerdict(); calc(); });
+
+  /* 사용자가 제공한 취득·매도 비용 (금액은 원, 체크 시에만 자동 포함).
+     과거 기타 필요경비 필드와 분리해 중복 합산 방지. */
+  var EXPENSES = [
+    {id:'acqTax',name:'취득세',amount:14794450,grade:'증빙 시 인정 가능성 높음',desc:'2020년 주택 취득 당시 납부한 취득세. 위택스 납부내역 확인',evidence:'취득세 납부확인서 · 위택스',tip:'취득가액에 이미 포함했거나 홈택스 자동 반영된 경우 중복 불가'},
+    {id:'agent',name:'매수·매도 중개보수 합계',amount:5000000,grade:'증빙 시 인정 가능성 높음',desc:'살 때와 팔 때 합쳐 지급한 500만 원. 양쪽 영수증을 나누어 보관',evidence:'현금영수증 · 계좌이체내역 · 중개보수 영수증',tip:'다른 신고 항목에 각각 입력했다면 이 체크는 해제'},
+    {id:'radon',name:'라돈 검출에 따른 의무 보수',amount:1300000,grade:'개별 검토 · 기본 제외',desc:'라돈 검출로 보수가 필요하다는 안내를 받고 실제로 시공한 130만 원. 의무적으로 보수했더라도 일반 하자수리라면 필요경비가 아닐 수 있습니다. 환기설비 신설 등 자본적 개량인지 공사내역 확인',evidence:'라돈 검사결과 · 보수 요청/안내 문서 · 공사 세부내역 · 결제증빙 · 전후 사진',tip:'라돈 검출 사실이나 의무 보수 지시만으로 자동 공제되는 것은 아님'},
+    {id:'aircon',name:'천장 매립형 시스템에어컨 설치',amount:5700000,grade:'인정 검토 우선 · 증빙 필요',desc:'아파트 천장에 고정 설치한 냉난방설비 570만 원. 일반 이동형 가전과 달리 건물의 이용편의·가치 증대를 위한 자본적 지출로 볼 근거가 있습니다. 설치 공사비와 기기 대금의 구분, 매각 시 설비 존치 여부 확인',evidence:'천장형 설치 계약서 · 기기/설치공사 세부내역 · 카드/계좌이체 증빙 · 설치 사진 · 매매 시 존치 확인',tip:'고정 설치되었다는 사실만으로 전액 자동 인정은 아닙니다. 설비의 자본적 지출 해당 여부 확인'}
+  ];
+  function expenseValue(e) { var v=T.expenses[e.id]; return v && isFinite(+v.amount) && +v.amount>=0 ? +v.amount : e.amount; }
+  function expenseSelected(e) { var v=T.expenses[e.id]; return !!(v && v.selected === true); }
+  function chosenExpenseTotal() { return EXPENSES.reduce(function(sum,e){ return sum+(expenseSelected(e)?expenseValue(e):0); },0); }
+  function fullCost() { return toNum(T.cost)+chosenExpenseTotal(); }
+  function renderExpenses(){
+    $('expenseRows').innerHTML=EXPENSES.map(function(e){
+      var checked=expenseSelected(e),money=expenseValue(e);
+      return '<div class="expense-item'+(checked?' selected':'')+'"><label class="expense-main"><input type="checkbox" data-excheck="'+e.id+'" '+(checked?'checked':'')+'><span class="expense-details"><strong>'+e.name+'</strong><small>'+e.grade+'</small></span></label>'+
+        '<label class="expense-amount">금액(원)<input type="text" inputmode="numeric" data-exmoney="'+e.id+'" value="'+Math.round(money).toLocaleString('ko-KR')+'" aria-label="'+e.name+' 금액"></label>'+
+        '<p class="small">'+e.desc+'</p><p class="tiny muted"><b>챙길 증빙:</b> '+e.evidence+'</p><p class="tiny muted"><b>주의:</b> '+e.tip+'</p></div>';
+    }).join('');
+    var sh=Math.max(0,Math.min(100,+T.share||0))/100, total=fullCost();
+    $('chosenExpenses').textContent=won(chosenExpenseTotal());
+    $('otherExpenses').textContent=won(toNum(T.cost));
+    $('allExpenses').textContent=won(total);
+    $('expensePerson').textContent='지분 기준 남편 '+won(total*sh)+' · 아내 '+won(total*(1-sh))+' (양도차익 계산에 반영)';
+    document.querySelectorAll('[data-excheck]').forEach(function(el){el.addEventListener('change',function(){
+      var id=this.getAttribute('data-excheck'), e=EXPENSES.filter(function(x){return x.id===id;})[0];
+      T.expenses[id]={selected:this.checked,amount:expenseValue(e)};persist();renderExpenses();calc();
+    });});
+    document.querySelectorAll('[data-exmoney]').forEach(function(el){el.addEventListener('change',function(){
+      var id=this.getAttribute('data-exmoney'),e=EXPENSES.filter(function(x){return x.id===id;})[0],a=toNum(this.value);
+      T.expenses[id]={selected:expenseSelected(e),amount:a};persist();renderExpenses();calc();
+    });});
+  }
 
   /* 세액 계산 */
   var BR = [[14e6, .06, 0], [50e6, .15, 1.26e6], [88e6, .24, 5.76e6], [150e6, .35, 15.44e6], [300e6, .38, 19.94e6], [500e6, .40, 25.94e6], [1e9, .42, 35.94e6], [Infinity, .45, 65.94e6]];
@@ -64,7 +99,7 @@
     return y;
   }
   function person(shareRatio) {
-    var sale = toNum(T.sale) * shareRatio, buy = toNum(T.buy) * shareRatio, cost = toNum(T.cost) * shareRatio;
+    var sale = toNum(T.sale) * shareRatio, buy = toNum(T.buy) * shareRatio, cost = fullCost() * shareRatio;
     var gain = Math.max(0, sale - buy - cost);
     var yrs = heldYears(CM.parse(T.acq), CM.parse(saleISO));
     var ltRate = yrs === null || yrs < 3 ? 0 : Math.min(0.30, yrs * 0.02);
@@ -105,6 +140,7 @@
 
     var couple = exempt ? 0 : H.total + W.total;
     if (!has && !exempt) {
+      CM.save('taxEstimate', {valid:false, at:CM.iso(CM.today())});
       $('tCouple').textContent = '–'; $('tCoupleS').textContent = '아래 계산기에 금액 입력';
       $('vsPrep').className = 'callout info'; $('vsPrep').innerHTML = '<p class="small">양도가액과 취득가액을 넣으면, 준비한 1억 원과 비교해 드립니다.</p>';
       return;
@@ -118,7 +154,7 @@
       : (gap >= 0
         ? '<b class="t">준비한 1억 원으로 충분합니다 (부부 합계 ' + manwon(gap) + ' 여유)</b><p class="small">분납을 쓰면 1월에는 최대 ' + manwon(couple - H.instMax - W.instMax) + ' 원만 내고, 나머지는 2개월 뒤에 냅니다.</p>'
         : '<b class="t">준비한 1억 원보다 ' + manwon(-gap) + ' 부족합니다</b><p class="small">분납(최대 ' + manwon(H.instMax + W.instMax) + ')을 쓰거나, 장기예금이 아닌 파킹통장에서 부족분을 준비하세요.</p>');
-    CM.save('taxEstimate', { couple: couple, at: CM.iso(CM.today()) });
+    CM.save('taxEstimate', { valid: has && T.verdict === 'taxable' && !!T.acq, couple: couple, husband:H.total, wife:W.total, at: CM.iso(CM.today()) });
   }
   function money(el, key) {
     el.value = T[key] ? toNum(T[key]).toLocaleString('ko-KR') : '';
@@ -126,28 +162,29 @@
     el.addEventListener('blur', function () { el.value = toNum(el.value) ? toNum(el.value).toLocaleString('ko-KR') : ''; });
   }
   money($('sale'), 'sale'); money($('buy'), 'buy'); money($('cost'), 'cost');
+  $('cost').addEventListener('input', renderExpenses);
   $('share').value = T.share;
-  $('share').addEventListener('change', function () { var v = +this.value; if (v >= 0 && v <= 100) { T.share = v; persist(); calc(); } else { this.value = T.share; } });
+  $('share').addEventListener('change', function () { var v = +this.value; if (v >= 0 && v <= 100) { T.share = v; persist(); renderExpenses(); calc(); } else { this.value = T.share; } });
   $('acq').value = T.acq;
   $('acq').addEventListener('change', function () { T.acq = this.value; persist(); calc(); });
 
   $('copyTax').addEventListener('click', function () {
     var sh = (+T.share || 0) / 100, H = person(sh);
     CM.copy(['양도소득세 1인 입력 검산 (지분 ' + (sh * 100) + '%)', '양도가액 ' + won(H.sale), '취득가액 ' + won(H.buy), '필요경비 ' + won(H.cost),
-      '양도차익 ' + won(H.gain), '장기보유특별공제 ' + Math.round(H.ltRate * 100) + '% ' + won(H.lt), '과세표준 ' + won(H.base),
+      '선택 비용 '+won(chosenExpenseTotal()), '기타 비용 '+won(toNum(T.cost)), '양도차익 ' + won(H.gain), '장기보유특별공제 ' + Math.round(H.ltRate * 100) + '% ' + won(H.lt), '과세표준 ' + won(H.base),
       '국세 ' + won(H.tax) + ' + 지방세 ' + won(H.local) + ' = ' + won(H.total), '※ 참고 추정치, 홈택스 금액이 기준'].join('\n'));
   });
   var armed = false;
   $('clearTax').addEventListener('click', function () {
     var b = this;
     if (!armed) { armed = true; b.textContent = '한 번 더 누르면 지웁니다'; setTimeout(function () { armed = false; b.textContent = '입력 지우기'; }, 3000); return; }
-    T.sale = T.buy = T.cost = T.acq = ''; T.share = 50; persist();
+    T.sale = T.buy = T.cost = T.acq = ''; T.share = 50; T.expenses = {}; persist(); renderExpenses();
     ['sale', 'buy', 'cost', 'acq'].forEach(function (k) { $(k).value = ''; }); $('share').value = 50;
     CM.save('taxEstimate', null); armed = false; b.textContent = '입력 지우기'; calc(); CM.toast('지웠습니다');
   });
 
   /* 서류 */
-  var docs = ['살 때 매매계약서', '팔 때 매매계약서', '취득세 납부내역 (위택스)', '살 때 중개보수 영수증', '팔 때 중개보수 영수증', '법무사 비용 영수증 (해당 시)', '확장·샷시 공사계약서와 이체내역 (해당 시)', '등기사항전부증명서 (지분·취득일 확인)'];
+  var docs = ['살 때 매매계약서', '팔 때 매매계약서', '취득세 납부내역 (위택스)', '살 때 중개보수 영수증', '팔 때 중개보수 영수증', '법무사 비용 영수증 (해당 시)', '라돈 검사 및 수리 공사 내역·결제증빙', '에어컨 종류·설치내역·결제증빙', '확장·샷시 공사계약서와 이체내역 (해당 시)', '등기사항전부증명서 (지분·취득일 확인)'];
   (function () {
     var box = $('docChecks');
     docs.forEach(function (t, i) {
@@ -183,5 +220,37 @@
   $('pH').addEventListener('click', function () { who = 'h'; renderPeople(); });
   $('pW').addEventListener('click', function () { who = 'w'; renderPeople(); });
 
-  renderDates(); renderVerdict(); calc(); renderPeople();
+  /* 확정 납부액을 예금 화면에 동기화. 입력 변경 시 확정 체크 자동 해제 */
+  var actualKeys = [['actualHN','hNational'],['actualHL','hLocal'],['actualWN','wNational'],['actualWL','wLocal']];
+  var A = Object.assign({confirmed:false, verdict:T.verdict, hNational:null,hLocal:null,wNational:null,wLocal:null},CM.load('taxActual',{}));
+  function realNum(v){return Number(String(v||'').replace(/[^0-9]/g,''))||0;}
+  function realReady(){return actualKeys.every(function(x){return A[x[1]]!==null && A[x[1]]!==undefined && String(A[x[1]])!=='';});}
+  function renderActual(){
+    $('actualConfirmed').checked=!!A.confirmed;
+    var b=CM.taxBridge(), status=$('actualStatus');
+    if(A.confirmed && b.mode==='actual'){
+      status.className='callout '+(b.couple>100000000?'warn':'ok');
+      status.innerHTML='<b class="t">연계 완료 · 부부 합계 '+won(b.couple)+'</b><p class="small">남편 '+won(b.husband)+' · 아내 '+won(b.wife)+' · 준비된 1억 원과 차이 '+won(Math.abs(100000000-b.couple))+' ('+(b.couple>100000000?'부족':'여유')+'). 예금 화면에서 부부별 부족분도 확인하세요.</p>';
+    }else{
+      status.className='callout info';
+      status.innerHTML='<b class="t">확정 대기 · 기존 단기예금 1억 원 유지</b><p class="small">확정 체크 전까지는 예금 화면에 참고 추정액만 표시되며, 단기예금 원금이나 배분이 자동 변경되지 않습니다.</p>';
+    }
+  }
+  actualKeys.forEach(function(pair){
+    var el=$(pair[0]), key=pair[1];el.value=A[key]===null||A[key]===undefined?'':Number(A[key]).toLocaleString('ko-KR');
+    el.addEventListener('input',function(){A[key]=this.value.trim()===''?null:realNum(this.value);A.confirmed=false;CM.save('taxActual',A);renderActual();});
+    el.addEventListener('blur',function(){this.value=A[key]===null?'':Number(A[key]).toLocaleString('ko-KR');});
+  });
+  $('actualConfirmed').addEventListener('change',function(){
+    if(this.checked && !(realReady() || T.verdict==='exempt')){this.checked=false;CM.toast('부부 국세·지방세 4개 금액을 모두 입력해주세요 (0원 포함)');return;}
+    if(this.checked && T.verdict!=='taxable' && T.verdict!=='exempt'){this.checked=false;CM.toast('위에서 과세 대상 또는 비과세 확정 상태를 선택해주세요');return;}
+    A.confirmed=this.checked;A.verdict=T.verdict;CM.save('taxActual',A);renderActual();
+  });
+  $('clearActual').addEventListener('click',function(){
+    if(!window.confirm('실제 납부액 4개와 확정 상태를 지울까요?'))return;
+    actualKeys.forEach(function(pair){A[pair[1]]=null;$(pair[0]).value='';});A.confirmed=false;CM.save('taxActual',A);renderActual();
+  });
+
+  renderDates(); renderVerdict(); renderExpenses(); calc(); renderPeople(); renderActual();
 })();
+

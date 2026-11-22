@@ -62,9 +62,21 @@
       <div class="fields">
         <label class="field" for="sale">전체 양도가액 (원)<input type="text" inputmode="numeric" id="sale" class="wide" placeholder="예: 1,000,000,000"></label>
         <label class="field" for="buy">전체 취득가액 (원)<input type="text" inputmode="numeric" id="buy" class="wide" placeholder="예: 700,000,000"></label>
-        <label class="field" for="cost">전체 필요경비 (원)<input type="text" inputmode="numeric" id="cost" class="wide" placeholder="취득세·중개보수 등"></label>
+        <label class="field" for="cost">기타 필요경비 (원 · 아래 4개 항목 제외)<input type="text" inputmode="numeric" id="cost" class="wide" placeholder="아래 항목에 없는 추가 비용만 입력"></label>
         <label class="field" for="share">남편 지분 %<input type="number" id="share" min="0" max="100" step="1"></label>
         <label class="field" for="acq">취득일<input type="date" id="acq" class="wide"></label>
+      </div>
+      <div class="expense-panel" id="expense-panel">
+        <h3>🧾 지출한 비용 기억해두기 · 체크하면 자동 합산</h3>
+        <p class="small muted">말씀하신 실제 지출금액을 미리 기록했습니다. 라돈은 <b>검출 후 필요해서 보수</b>한 비용, 에어컨은 <b>천장에 고정 설치한 시스템에어컨</b>으로 반영했습니다. <b>처음에는 모두 미선택</b>이며, 인정 가능 여부·증빙을 확인한 뒤 체크하세요. 금액은 직접 고칠 수 있습니다.</p>
+        <div id="expenseRows" class="expense-list"></div>
+        <div class="expense-total" aria-live="polite">
+          <div><span>선택한 비용</span><strong id="chosenExpenses">0원</strong></div>
+          <div><span>기타 필요경비</span><strong id="otherExpenses">0원</strong></div>
+          <div class="expense-grand"><span>전체 필요경비 (부부 합산)</span><strong id="allExpenses">0원</strong></div>
+          <p class="tiny muted" id="expensePerson">남편과 아내 지분에 따라 나누어 계산합니다.</p>
+        </div>
+        <div class="callout warn"><b class="t">중복 입력 주의</b><p class="small">위의 ‘기타 필요경비’에 이미 적힌 취득세·중개보수·공사비는 아래에서 다시 체크하지 마세요. 홈택스에 자동 조회된 취득세 등을 중복 입력해도 안 됩니다. 체크는 <b>증빙과 세법상 인정 확인</b>을 대신하지 않습니다.</p></div>
       </div>
       <div class="tbl"><table>
         <thead><tr><th>항목</th><th class="r">남편</th><th class="r">아내</th></tr></thead>
@@ -76,6 +88,22 @@
     </div>
   </section>
 
+  <section aria-labelledby="h-real" id="actual-tax">
+    <div class="sec-head"><span class="step-no">STEP 1-1 · 예금 자동 연계</span><h2 id="h-real">실제 신고·납부 금액 입력</h2></div>
+    <div class="card stack">
+      <div class="callout info"><b class="t">이곳에 입력하면 예금 화면에도 자동 반영됩니다.</b><p class="small">위의 세액 계산은 참고 추정치입니다. 홈택스 국세와 위택스 지방소득세의 <b>각자 납부할 실제 금액</b>을 아래에 입력하세요. 숫자는 이 기기의 브라우저에만 보관됩니다.</p></div>
+      <div class="fields">
+        <label class="field" for="actualHN">남편 국세(원)<input id="actualHN" type="text" inputmode="numeric" placeholder="홈택스 확인 금액"></label>
+        <label class="field" for="actualHL">남편 지방소득세(원)<input id="actualHL" type="text" inputmode="numeric" placeholder="위택스 확인 금액"></label>
+        <label class="field" for="actualWN">아내 국세(원)<input id="actualWN" type="text" inputmode="numeric" placeholder="홈택스 확인 금액"></label>
+        <label class="field" for="actualWL">아내 지방소득세(원)<input id="actualWL" type="text" inputmode="numeric" placeholder="위택스 확인 금액"></label>
+      </div>
+      <label class="check"><input type="checkbox" id="actualConfirmed"><span>위 4개 금액(0원 포함)을 실제 신고자료와 대조했습니다. 예금 운용에 <b>확정 입력액</b>으로 적용합니다.</span></label>
+      <div class="callout" id="actualStatus" aria-live="polite"></div>
+      <div class="btns"><a class="btn" href="deposit.html#tax-link">예금 운용에 반영된 결과 보기 →</a><button class="btn ghost" id="clearActual" type="button">실제 납부액 입력 초기화</button></div>
+      <p class="tiny muted">아직 금액을 모르거나 비과세 확인 전이라면 체크하지 마세요. 0원은 직접 확인된 경우에만 입력하세요. 분납할 경우 1차·2차 납부액과 기한을 각각 확보해야 합니다. 합계에는 지방세가 포함됩니다.</p>
+    </div>
+  </section>
   <section aria-labelledby="h-docs">
     <div class="sec-head"><span class="step-no">STEP 2 · 서류</span><h2 id="h-docs">한 폴더에 모을 서류</h2></div>
     <div class="grid2">
@@ -88,7 +116,7 @@
             <tr><td>취득세·등록 관련 세금</td><td>대출 이자, 원금 상환</td></tr>
             <tr><td>살 때·팔 때 중개보수</td><td>도배·장판·싱크대 교체 같은 수선</td></tr>
             <tr><td>법무사 비용</td><td>보일러 수리 등 유지비</td></tr>
-            <tr><td>확장·샷시 등 자본적 지출 (계약서+이체내역)</td><td>영수증 없는 현금 지급</td></tr>
+            <tr><td>건물에 고정된 냉난방설비 설치 등 자본적 지출 (성격·증빙 확인)</td><td>탈착 가능한 가전 구입·일반 유지보수</td></tr>
           </tbody>
         </table></div>
       </div>
@@ -153,6 +181,8 @@
   <section aria-labelledby="h-src">
     <div class="sec-head"><h2 id="h-src">공식 근거</h2></div>
     <div class="card small"><ul class="clean">
+      <li><a href="https://www.nts.go.kr/tax/sub/1.2.1.%EC%B7%A8%EB%93%9D%EA%B0%80%EC%95%A1%20%EB%B0%8F%20%ED%95%84%EC%9A%94%EA%B2%BD%EB%B9%84%EA%B3%84%EC%82%B0%20%EC%83%81%EC%84%B8%20%EB%AA%85%EC%84%B8%EC%84%9C.html" target="_blank" rel="noopener">국세청 · 취득세·중개보수·자본적 지출 필요경비 안내</a></li>
+      <li><a href="https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&amp;lsJoLnkSeq=1031543733" target="_blank" rel="noopener">국가법령정보센터 · 소득세법 시행령 제163조</a></li>
       <li><a href="https://www.nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2307&amp;nttSn=1346909" target="_blank" rel="noopener">국세청 · 부동산 양도소득세 예정신고 방법(간편신고)</a></li>
       <li><a href="https://www.nts.go.kr/nts/na/ntt/selectNttInfo.do?mi=2307&amp;nttSn=1346906" target="_blank" rel="noopener">국세청 · 예정신고 방법(일반신고)</a></li>
       <li><a href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7710&amp;mi=2312" target="_blank" rel="noopener">국세청 · 양도소득세 세율과 장기보유특별공제</a></li>

@@ -83,7 +83,26 @@
     return w;
   }
 
+  function renderTaxLink(){
+    var b=CM.taxBridge(), label=function(n){return Math.round(n).toLocaleString('ko-KR')+'원';};
+    $('linkMode').textContent=b.mode==='actual'?'확정 입력':(b.mode==='estimate'?'참고 추정':'미입력');
+    $('linkSource').textContent=b.message||'양도세 페이지에서 입력하세요';
+    if(b.mode==='none'){
+      $('linkTotal').textContent='–';$('linkGap').textContent='–';$('linkGapS').textContent='부부 각 5,000만 원 유지';
+      $('linkRows').innerHTML='<tr><td>현재 단기 준비금</td><td class="r">5,000만</td><td class="r">5,000만</td><td class="r">1억</td></tr>';
+      $('linkAdvice').className='callout info';$('linkAdvice').innerHTML='<b class="t">양도세 입력을 기다리는 중입니다.</b><p class="small">예금 계획의 단기자금 1억 원은 변경하지 않습니다.</p>';return;
+    }
+    var gap=b.prepared-b.couple;
+    $('linkTotal').textContent=label(b.couple);$('linkGap').textContent=(gap>=0?'+':'−')+label(Math.abs(gap));
+    $('linkGapS').textContent=gap>=0?'준비금 여유':'추가 확보가 필요한 금액';
+    var row=function(title,h,w){return '<tr><td>'+title+'</td><td class="r">'+label(h)+'</td><td class="r">'+label(w)+'</td><td class="r">'+label(h+w)+'</td></tr>';};
+    $('linkRows').innerHTML=row('현재 단기예금',b.preparedH,b.preparedW)+row('세금 '+(b.mode==='actual'?'확정 입력액':'참고 추정액'),b.husband,b.wife)+row('남는 금액(양수) / 부족분(음수)',b.preparedH-b.husband,b.preparedW-b.wife);
+    var detail='남편 '+(b.husband>b.preparedH?label(b.husband-b.preparedH)+' 추가 필요':label(b.preparedH-b.husband)+' 여유')+' · 아내 '+(b.wife>b.preparedW?label(b.wife-b.preparedW)+' 추가 필요':label(b.preparedW-b.wife)+' 여유');
+    $('linkAdvice').className='callout '+(b.mode==='estimate'?'info':(gap<0||b.husband>b.preparedH||b.wife>b.preparedW?'warn':'ok'));
+    $('linkAdvice').innerHTML='<b class="t">'+(b.mode==='estimate'?'참고값입니다. 1억 원을 그대로 유지하세요.':(gap<0?'납부자금 부족: 자금 추가 확보 필요':'납부자금 점검 완료'))+'</b><p class="small">'+detail+'. '+(b.mode==='actual'?'남는 돈은 납부 완료 후 재예치 여부를 검토하세요.':'실제 국세·지방세 입력 후 확정 체크를 해야 예금 의사결정에 이용할 수 있습니다.')+'</p>';
+  }
   function render() {
+    renderTaxLink();
     ['A', 'B', 'C'].forEach(function (s) { $('sc' + s).setAttribute('aria-pressed', S.scen === s ? 'true' : 'false'); });
     $('days').textContent = days() + '일';
     var R = {};

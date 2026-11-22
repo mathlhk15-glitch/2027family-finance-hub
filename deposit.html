@@ -18,10 +18,25 @@
 <header class="hero"><div class="in">
   <span class="kicker">부부 각자 2억 1,250만 · 1인 장기 1억 6,250만 + 단기 5,000만</span>
   <h1>예금 운용 계산기</h1>
-  <p class="lead">신협 금리를 전화로 확인한 뒤 숫자만 바꾸면, 어느 안이 유리한지와 금융회사별 예금자보호 한도를 바로 보여줍니다.</p>
+  <p class="lead">신협·은행 금리를 비교하고, 양도세 화면에 입력한 부부별 납부액을 불러와 1월 준비금 1억 원과 함께 점검합니다.</p>
 </div></header>
 
 <main>
+  <section id="tax-link" aria-labelledby="h-link">
+    <div class="sec-head"><span class="step-no">자동 연계 · 양도세 → 예금</span><h2 id="h-link">1월 세금, 얼마를 남겨야 할까요?</h2></div>
+    <div class="card stack">
+      <div class="callout info"><b class="t">양도세 페이지에 입력한 금액을 자동으로 불러옵니다.</b><p class="small">남편·아내의 국세와 지방소득세를 합산해 1억 원 준비금과 비교합니다. 입력하지 않았다면 현재 계획(각 5,000만 원)을 그대로 유지합니다.</p></div>
+      <div class="tiles">
+        <div class="tile"><span class="k">연계 상태</span><span class="v" id="linkMode">미입력</span><span class="s" id="linkSource">양도세 입력 대기</span></div>
+        <div class="tile sun"><span class="k">국세·지방세 납부 합계</span><span class="v" id="linkTotal">–</span><span class="s">부부 합산</span></div>
+        <div class="tile mint"><span class="k">1억 준비금과 차이</span><span class="v" id="linkGap">–</span><span class="s" id="linkGapS">실제 신고액이 확정될 때까지 보관</span></div>
+      </div>
+      <div class="tbl"><table><thead><tr><th>구분</th><th class="r">남편</th><th class="r">아내</th><th class="r">합계</th></tr></thead><tbody id="linkRows"></tbody></table></div>
+      <div class="callout" id="linkAdvice" aria-live="polite"></div>
+      <div class="btns"><a class="btn" href="tax.html#actual-tax">양도세 실제 납부액 입력하기 →</a><a class="btn ghost" href="index.html">첫 화면 보기</a></div>
+      <p class="tiny muted">자동 연계는 같은 사이트 주소·같은 브라우저에서만 됩니다. GitHub 사이트는 서버나 다른 기기로 금액을 전송하지 않습니다. 세금 확정 후에도 기존 가입 예금이 자동 해지·이체되지 않습니다.</p>
+    </div>
+  </section>
   <section aria-labelledby="h-plan">
     <div class="sec-head"><span class="step-no">01 · 안 고르기</span><h2 id="h-plan">세 가지 배분안</h2></div>
     <div class="grid2">

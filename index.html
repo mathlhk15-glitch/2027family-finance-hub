@@ -18,7 +18,7 @@
 <header class="hero"><div class="in">
   <span class="kicker">2026. 11. 22. 작성 · 매도 후 첫 3개월 계획</span>
   <h1>집 판 돈, 안전하게 넣고<br>양도세까지 한 번에 끝내기</h1>
-  <p class="lead">장기 3억 2,500만 원은 1년 예금으로, 1월에 쓸 1억 원은 1월 28일까지 꺼낼 수 있게 따로 둡니다. 양도세는 부부가 각자 신고·납부합니다.</p>
+  <p class="lead">장기 3억 2,500만 원은 1년 예금으로, 1월에 쓸 1억 원은 1월 28일까지 꺼낼 수 있게 따로 둡니다. 양도세는 부부가 각자 신고·납부합니다. 세금 입력금액은 예금 운용 화면으로 자동 연결됩니다.</p>
 </div></header>
 
 <main>
@@ -27,7 +27,7 @@
       <div class="tile"><span class="k">관리하는 돈</span><span class="v">4억 2,500만</span><span class="s">장기 3억 2,500만 + 단기 1억</span></div>
       <div class="tile mint"><span class="k">단기예금 만기까지</span><span class="v" id="dShort">–</span><span class="s" id="dShortS">2027. 1. 28.(목)</span></div>
       <div class="tile sun"><span class="k">양도세 예정신고 기한까지</span><span class="v" id="dTax">–</span><span class="s" id="dTaxS">–</span></div>
-      <div class="tile"><span class="k">예상 세액 (세금 페이지 계산값)</span><span class="v" id="estTax">미계산</span><span class="s" id="estTaxS">양도세 페이지에서 금액을 넣으면 표시</span></div>
+      <div class="tile"><span class="k">연계된 세금 납부액</span><span class="v" id="estTax">미계산</span><span class="s" id="estTaxS">양도세 페이지에서 금액을 넣으면 표시</span></div>
     </div>
   </section>
 
@@ -114,14 +114,13 @@
   $('dTax').textContent = dd(dl);
   $('dTaxS').textContent = CM.fmt(dl) + ' (주말이면 다음 평일)';
 
-  var est = CM.load('taxEstimate', null);
-  if (est && est.couple > 0) {
-    $('estTax').textContent = Math.round(est.couple / 10000).toLocaleString('ko-KR') + '만';
-    var gap = 10000 * 10000 - est.couple;
-    $('estTaxS').textContent = '부부 합계(지방세 포함) · 준비한 1억 대비 ' + (gap >= 0 ? Math.round(gap / 10000).toLocaleString('ko-KR') + '만 여유' : Math.round(-gap / 10000).toLocaleString('ko-KR') + '만 부족');
-  } else if (est && est.couple === 0) {
-    $('estTax').textContent = '0원';
-    $('estTaxS').textContent = '비과세로 표시됨 · 1억 원 장기 전환 검토';
+  var bridge=CM.taxBridge();
+  if(bridge.mode!=='none'){
+    $('estTax').textContent=Math.round(bridge.couple/10000).toLocaleString('ko-KR')+'만';
+    var gap=100000000-bridge.couple;
+    $('estTaxS').textContent=(bridge.mode==='actual'?'확정 입력액':'참고 추정액 · 아직 확정 전')+' · 남편 '+Math.round(bridge.husband/10000).toLocaleString('ko-KR')+'만 / 아내 '+Math.round(bridge.wife/10000).toLocaleString('ko-KR')+'만 · '+(gap>=0?'준비금 여유 ':'준비금 부족 ')+Math.round(Math.abs(gap)/10000).toLocaleString('ko-KR')+'만';
+  } else {
+    $('estTax').textContent='미입력';$('estTaxS').textContent='양도세 신고 화면에서 금액을 입력하면 자동 반영됩니다';
   }
 
   var items = [

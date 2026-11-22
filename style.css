@@ -168,3 +168,17 @@ footer{max-width:1080px;margin:0 auto;padding:0 16px 40px;font-size:13px;color:v
   .card,.tile,.go-card{box-shadow:none;break-inside:avoid}
   .hero{background:#fff}
 }
+
+/* 사용자가 실제 지급한 필요경비 선택 계산기 */
+.expense-panel{border:1px solid #d2e3f6;border-radius:14px;padding:16px;background:#f9fcff;display:flex;flex-direction:column;gap:12px}
+.expense-panel h3{color:#185fa5}.expense-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.expense-item{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.expense-item.selected{border:2px solid var(--mint);background:#f2fbf9;padding:12px}
+.expense-main{display:flex;align-items:center;gap:10px;cursor:pointer}.expense-main input{width:22px;height:22px;accent-color:var(--mint);flex:0 0 auto}
+.expense-details{display:flex;flex-direction:column;gap:1px}.expense-details strong{font-size:15px}.expense-details small{font-size:12px;color:var(--muted)}
+.expense-amount{font-size:12px;color:var(--muted);font-weight:700;display:flex;align-items:center;gap:9px;justify-content:space-between}
+.expense-amount input{width:min(160px,65%);text-align:right;font-variant-numeric:tabular-nums}
+.expense-total{border:1px solid #bcd8d3;border-radius:12px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:7px}
+.expense-total>div{display:flex;justify-content:space-between;gap:15px;align-items:center}
+.expense-grand{border-top:1px solid var(--line);padding-top:8px;font-weight:800;color:#117766}
+@media(max-width:680px){.expense-list{grid-template-columns:1fr}.expense-panel{padding:12px}}

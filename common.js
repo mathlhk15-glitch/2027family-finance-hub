@@ -76,7 +76,26 @@
   function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
   function today() { var t = new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); }
 
+  /* 양도세 -> 예금 연결: 같은 origin(GitHub Pages)에서만 기기별 공유 */
+  function taxBridge() {
+    var actual = load('taxActual', null);
+    var est = load('taxEstimate', null);
+    var tax = load('tax', {});
+    var fmtNum = function(x) { var n = Number(x); return Number.isFinite(n) && n >= 0 ? n : 0; };
+    var mode = 'none', husband = 0, wife = 0, message = '';
+    if (actual && actual.confirmed === true && ['taxable','exempt'].indexOf(actual.verdict) >= 0) {
+      mode = 'actual';
+      husband = actual.verdict === 'exempt' ? 0 : fmtNum(actual.hNational) + fmtNum(actual.hLocal);
+      wife = actual.verdict === 'exempt' ? 0 : fmtNum(actual.wNational) + fmtNum(actual.wLocal);
+      message = actual.verdict === 'exempt' ? '비과세 최종 확인 입력' : '사용자가 입력한 국세·지방세 납부액';
+    } else if (est && est.valid === true && tax && tax.verdict === 'taxable') {
+      mode = 'estimate'; husband = fmtNum(est.husband); wife = fmtNum(est.wife);
+      message = '참고 추정액: 실제 신고 납부액이 아닙니다';
+    }
+    return { mode:mode, husband:husband, wife:wife, couple:husband+wife,
+      preparedH:50000000, preparedW:50000000, prepared:100000000, message:message };
+  }
   window.CM = { load: load, save: save, clearAll: clearAll, toast: toast, copy: copy,
     parse: parse, fmt: fmt, iso: iso, prelimDeadline: prelimDeadline, installmentDue: installmentDue,
-    daysBetween: daysBetween, today: today };
+    daysBetween: daysBetween, today: today, taxBridge: taxBridge };
 })();
